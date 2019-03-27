@@ -1,0 +1,99 @@
+server:
+  port: 8822
+# upgrade
+upgrade:
+  enabled: true
+  version: v1.0.7
+  application-name: ${spring.application.name}
+  upgrade-script: classpath:/upgrade/edpglobal_config_server.sql
+# spring
+spring:
+  application:
+    name: edpglobal-config-server-ui
+  main:
+    banner-mode: 'off'
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://10.32.15.91:3306/edpglobal_config_server?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: edpuser
+    password: oawLaWSL@1
+    druid:
+      # 验证连接是否有效。此参数必须设置为非空字符串，下面三项设置成true才能生效
+      validation-query: SELECT 1
+      # 连接是否被空闲连接回收器(如果有)进行检验. 如果检测失败, 则连接将被从池中去除
+      test-while-idle: true
+      # 是否在从池中取出连接前进行检验, 如果检验失败, 则从池中去除连接并尝试取出另一个
+      test-on-borrow: true
+      # 是否在归还到池中前进行检验
+      test-on-return: false
+      # 连接在池中最小生存的时间，单位是毫秒
+      min-evictable-idle-time-millis: 30000
+# thymeleaf
+  thymeleaf:
+    enabled: true
+    enable-spring-el-compiler: false
+    cache: false
+    mode: HTML
+    prefix: classpath:/templates/
+    suffix: .html
+    encoding: UTF-8
+    servlet:
+      content-type: text/html
+    check-template: true
+    check-template-location: true
+    reactive:
+      max-chunk-size: 0
+# hystrix 必须加否则无效(默认false)
+feign:
+  hystrix:
+    enabled: true
+  client:
+    config:
+      edpglobal-config-server:
+        connectTimeout: 10000
+        readTimeout: 10000
+        loggerLevel: basic
+# hystrix
+hystrix:
+  command:
+    default:
+      execution:
+        timeout:
+          enabled: false
+        isolation:
+          strategy: THREAD
+          thread:
+            timeoutInMilliseconds: 5000
+# mybatis
+mybatis:
+  mapperLocations: classpath:mapper/*.xml
+  typeAliasesPackage: com.edpglobal.config.server.model
+# edpglobal
+edpglobal:
+  swagger:
+    enabled: true
+# i18n
+i18n:
+  config:
+    enabled: true
+# logging
+logging:
+  path: /edpglobal/logs/${spring.application.name}
+  level:
+    root: info
+# eureka
+eureka:
+  client:
+    enabled: true
+    serviceUrl:
+      defaultZone: http://datahub.eureka.node1.com:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}
+    lease-renewal-interval-in-seconds: 1
+    lease-expiration-duration-in-seconds: 3

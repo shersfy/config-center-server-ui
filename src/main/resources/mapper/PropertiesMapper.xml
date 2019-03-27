@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.edpglobal.config.server.mapper.PropertiesMapper">
+    <resultMap id="BaseResultMap" type="com.edpglobal.config.server.model.Properties">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="label" property="label" jdbcType="VARCHAR"/>
+        <result column="profile" property="profile" jdbcType="VARCHAR"/>
+        <result column="application" property="application" jdbcType="VARCHAR"/>
+        <result column="key" property="key" jdbcType="VARCHAR"/>
+        <result column="value" property="value" jdbcType="LONGVARCHAR"/>
+        <result column="comment" property="comment" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+	<sql id="Base_Column_List">
+		id, label, profile, application, `key`, `value`, comment, create_time, update_time
+	</sql>
+	<select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List" />
+		from properties
+		where id = #{id,jdbcType=BIGINT}
+
+	</select>
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from properties
+		where id = #{id,jdbcType=BIGINT}
+	</delete>
+	
+	<delete id="deleteByIds">
+		delete from properties
+		where id in (${ids})
+	</delete>
+	<update id="updateById" parameterType="com.edpglobal.config.server.model.Properties">
+		update properties
+		<set>
+			<if test="label != null">
+				label = #{label,jdbcType=VARCHAR},
+			</if>
+
+			<if test="profile != null">
+				profile = #{profile,jdbcType=VARCHAR},
+			</if>
+
+			<if test="application != null">
+				application = #{application,jdbcType=VARCHAR},
+			</if>
+
+			<if test="key != null">
+				`key` = #{key,jdbcType=VARCHAR},
+			</if>
+
+			<if test="comment != null">
+				comment = #{comment,jdbcType=VARCHAR},
+			</if>
+
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+
+			<if test="updateTime != null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+
+			<if test="value != null">
+				`value` = #{value,jdbcType=LONGVARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=BIGINT}
+
+	</update>
+	<insert id="insert" parameterType="Properties" keyProperty="id" useGeneratedKeys="true">
+		insert into properties (id, label, profile,
+		application, `key`, comment,
+		create_time, update_time, `value`
+		)
+		values (#{id,jdbcType=BIGINT}, #{label,jdbcType=VARCHAR},
+		#{profile,jdbcType=VARCHAR},
+		#{application,jdbcType=VARCHAR}, #{key,jdbcType=VARCHAR}, #{comment,jdbcType=VARCHAR},
+		#{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+		#{value,jdbcType=LONGVARCHAR}
+		)
+	</insert>
+	<select id="getLabels" resultType="String">
+		SELECT label FROM `properties` 
+		GROUP BY label 
+		ORDER BY label
+	</select>
+	<select id="getProfiles" resultType="String">
+		SELECT `profile` FROM `properties` 
+		WHERE label='${label}'
+		GROUP BY `profile` 
+		ORDER BY `profile`
+	</select>
+	<select id="getApplications" resultType="String">
+		SELECT application FROM `properties` 
+		WHERE label='${label}' AND `profile`='${profile}'
+		GROUP BY application 
+		ORDER BY application
+	</select>
+	<select id="findList" resultMap="BaseResultMap" parameterType="Properties">
+		select
+		<include refid="Base_Column_List" />
+		from properties
+		<include refid="condition" />
+		<choose>
+			<when
+				test="(sort !=null and sort !='') and (order !=null and order !='')">order by ${sort} ${order}</when>
+			<otherwise>order by `key` asc</otherwise>
+		</choose>
+		<if test="startIndex !=null  and pageSize !=null">limit #{startIndex}, #{pageSize}</if>
+	</select>
+	<select id="findListCount" resultType="Long" parameterType="Properties">
+		select count(1) from properties
+		<include refid="condition" />
+	</select>
+	<sql id="condition">
+		<where>
+			<if test="label != null">and label = #{label, jdbcType=VARCHAR}</if>
+			<if test="profile != null">and profile = #{profile, jdbcType=VARCHAR}</if>
+			<if test="application != null">and application = #{application, jdbcType=VARCHAR}</if>
+			<if test="key != null">and `key` = #{key, jdbcType=VARCHAR}</if>
+			<if test="value != null">and `value` = #{value, jdbcType=VARCHAR}</if>
+			<if test="comment != null">and comment = #{comment, jdbcType=VARCHAR}</if>
+			<if test="createTime != null">and create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+			<if test="updateTime != null">and update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
+		</where>
+	</sql>
+</mapper>

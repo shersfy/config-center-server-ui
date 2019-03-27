@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>配置中心-首页</title>
+
+<meta charset="UTF-8" />
+<link href="/favicon.ico" rel="icon" type="image/x-icon" />
+<link href="css/main.css" rel="stylesheet" />
+
+<link rel="stylesheet" type="text/css" href="libs/jquery-easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="libs/jquery-easyui/themes/icon.css">
+
+<script type="text/javascript" charset="utf8" src="libs/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="libs/jquery-easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="libs/jquery-easyui/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="libs/spin.min.js"></script>
+<script type="text/javascript" src="libs/clipboard.min.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
+<script th:inline="javascript">
+	var basePath = [[${basePath}]];
+</script>
+<style type="text/css">
+	.block{
+		padding:20px;
+		margin-top: 5px;
+	}
+	.group-title{
+		margin: 5px;
+		font-size: 16px;
+	}
+	.group-item{
+		padding: 5px;
+	}
+</style>
+</head>
+<body>
+	<div id="content" class="easyui-panel" title="配置中心" data-options="region:'center',fit:false" style="padding: 10px;">
+		<div style="margin-top: 10px;"></div>
+		<span class="group-title">选择仓库类型</span>
+		<div class="easyui-panel block">
+			<form id="repo-form">
+				<div style="margin-bottom:20px">
+					<input type="radio" id="git" name="repo" value="git"/>Git仓库
+					<a id="gitUri" href="#" target="_blank"></a>
+	             </div>
+				<div style="margin-bottom:20px">
+					<input type="radio" id="jdbc" name="repo" value="jdbc"/>JDBC数据库
+	            </div>
+				<div style="margin-bottom:20px">
+					<a href="javascript:void(0);" title="重启【配置中心】服务" id="reboot" class="easyui-linkbutton">重启服务</a>
+	            </div>
+            </form>
+		</div>
+		<div style="margin-top: 20px;"></div>
+		<span class="group-title">应用配置</span>
+		<div class="easyui-panel block">
+			<div id="easyui-accordion">
+				<div title="添加应用配置" style="padding:10px;">
+					<form id="add-app-form">
+						<span class="group-item">仓库标签</span>
+						<input class="easyui-textbox" name="label" data-options="prompt:'请输入仓库标签'" style="width:150px;"/>
+						<span class="group-item">环境标签</span>
+						<input class="easyui-textbox" name="profile" data-options="prompt:'请输入环境标签'" style="width:150px;"/>
+						<span class="group-item">应用ID</span>
+						<input class="easyui-textbox" name="application" data-options="prompt:'请输入应用ID'" style="width:150px;"/>
+						<a class="easyui-linkbutton" id="addapp" href="javascript:void(0);" style="margin-left: 5px; width: 80px;">添加</a>
+					</form>
+				</div>
+			</div>
+			<div style="margin-top: 10px;">
+				<form id="app-form">
+					<span>
+						<a href="javascript:void(0);" id="reboot-app" class="easyui-linkbutton">重启应用</a>
+					</span>
+					<span class="group-item">
+						<a href="javascript:void(0);" id="refresh-app" class="easyui-linkbutton">刷新配置</a>
+					</span>
+					<span class="group-item">仓库标签</span>
+					<select id="label" class="easyui-combobox" style="width:100px;" data-options="panelHeight:'auto',editable:false"></select>
+					<span class="group-item">环境标签</span>
+					<select id="profile" class="easyui-combobox" style="width:100px;" data-options="panelHeight:'auto',editable:false"></select>
+					<span class="group-item">应用ID</span>
+					<select id="applications" class="easyui-combobox" style="width:200px;" data-options="panelHeight:'auto',editable:false"></select>
+					<span class="group-item">
+						<input id="searchbox"></input>
+					</span>
+				</form>
+			</div>
+			<div style="margin-top: 10px;">
+				<table id="properties"></table>
+			</div>
+			<div id="toolbar" style="height:auto">
+				<a href="javascript:void(0)" class="easyui-linkbutton no-git" data-options="iconCls:'icon-save',plain:true, disabled:true" onclick="Datagrid.save()">保存</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton no-git" data-options="iconCls:'icon-undo',plain:true, disabled:true" onclick="Datagrid.reject()">撤销</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton no-git" data-options="iconCls:'icon-add',plain:true, disabled:true" onclick="Datagrid.append()">添加</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton no-git" data-options="iconCls:'icon-remove',plain:true, disabled:true" onclick="Datagrid.removeit()">删除</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" id="copy" data-options="iconCls:'icon-copy',plain:true, disabled:true">复制</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" id="refresh"  data-options="iconCls:'icon-reload',plain:true, disabled:true" onclick="Datagrid.refresh()">刷新</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" id="upload"  data-options="iconCls:'icon-upload',plain:true">上传</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" id="download"  data-options="iconCls:'icon-download',plain:true, disabled:true" onclick="Datagrid.download()">下载</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" id="webscan"  data-options="iconCls:'icon-search',plain:true, disabled:true" onclick="Datagrid.webscan()">浏览</a>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
